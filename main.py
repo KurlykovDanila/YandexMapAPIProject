@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
 from PyQt5.QtCore import Qt
 
 
+# Hello there
+
+
 class Map(QMainWindow):
     def __init__(self):
         super().__init__()
