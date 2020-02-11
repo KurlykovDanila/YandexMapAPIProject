@@ -69,7 +69,7 @@ class Map(QMainWindow):
             return
         self.change_map()
 
-    def close_event(self, event):
+    def closeEvent(self, event):
         os.remove(self.map_file)
 
 
