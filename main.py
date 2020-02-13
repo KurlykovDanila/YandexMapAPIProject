@@ -45,6 +45,9 @@ class Map(QMainWindow):
         uic.loadUi('window.ui', self)
         self.change_map()
         self.pbShow.clicked.connect(self.get_coordinates)
+        self.sbScale.setMaximum(20)
+        self.sbScale.setMinimum(0)
+        self.sbScale.setValue(self.scale)
 
     def get_coordinates(self):
         x = self.lineGetX.text().strip()
@@ -57,6 +60,7 @@ class Map(QMainWindow):
             float(y)
         except ValueError:
             return
+        self.scale = self.sbScale.value()
         self.coordinates = [x, y]
         self.change_map()
 
@@ -67,6 +71,7 @@ class Map(QMainWindow):
             self.scale = max(self.scale - 1, 0)
         else:
             return
+        self.sbScale.setValue(self.scale)
         self.change_map()
 
     def closeEvent(self, event):
