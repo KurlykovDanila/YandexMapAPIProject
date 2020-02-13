@@ -15,15 +15,17 @@ class Map(QMainWindow):
         super().__init__()
         self.coordinates = ['82.920430', '55.030199']
         self.scale = 10
-        self.init_ui()
         self.step = 360 / (2 ** (self.scale))
+        self.map_type = "map"
+        self.map_file = None
+        self.init_ui()
 
     def get_image(self):
         map_api_server = "http://static-maps.yandex.ru/1.x/"
         map_params = {
             "ll": ",".join(self.coordinates),
             "z": str(self.scale),
-            "l": "map",
+            "l": self.map_type,
             "size": "450,450"
         }
         response = requests.get(map_api_server, params=map_params)
@@ -33,8 +35,12 @@ class Map(QMainWindow):
             print(response.url)
             print("Http статус:", response.status_code, "(", response.reason, ")")
             return
-
-        self.map_file = "map.png"
+        if self.map_file is not None:
+            os.remove(self.map_file)
+        if "sat" in self.map_type:
+            self.map_file = "map.jpg"
+        else:
+            self.map_file = "map.png"
         with open(self.map_file, "wb") as file:
             file.write(response.content)
 
@@ -50,6 +56,18 @@ class Map(QMainWindow):
         self.sbScale.setMaximum(20)
         self.sbScale.setMinimum(0)
         self.sbScale.setValue(self.scale)
+        self.radioLayout.itemAt(0).widget().toggle()
+        self.radioLayout.itemAt(0).widget().toggled.connect(
+            lambda: self.type_of_map("map" * int(self.radioLayout.itemAt(0).widget().isChecked())))
+        self.radioLayout.itemAt(1).widget().toggled.connect(
+            lambda: self.type_of_map("sat" * int(self.radioLayout.itemAt(1).widget().isChecked())))
+        self.radioLayout.itemAt(2).widget().toggled.connect(
+            lambda: self.type_of_map("map,trf,skl" * int(self.radioLayout.itemAt(2).widget().isChecked())))
+
+    def type_of_map(self, text):
+        if text != '':
+            self.map_type = text
+            self.change_map()
 
     def get_coordinates(self):
         x = self.lineGetX.text().strip()
