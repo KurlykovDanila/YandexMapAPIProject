@@ -30,6 +30,11 @@ class Map(QMainWindow):
         response = requests.get(geocoder_api_server, params=geocoder_params)
         if response:
             json_response = response.json()
+            self.labelForInfo.setText("""""")
+            if int(json_response["response"]["GeoObjectCollection"]['metaDataProperty']['GeocoderResponseMetaData']
+                   ['found']) == 0:
+                self.labelForInfo.setText("""REQUEST ERROR""")
+                return
             toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
             toponym_coodrinates = toponym["Point"]["pos"].split()
             self.coordinates = toponym_coodrinates[:]
@@ -50,9 +55,7 @@ class Map(QMainWindow):
         response = requests.get(map_api_server, params=map_params)
 
         if not response:
-            print("Ошибка выполнения запроса:")
-            print(response.url)
-            print("Http статус:", response.status_code, "(", response.reason, ")")
+            self.labelForInfo.setText("""IMAGE ERROR""")
             return
         if self.map_file is not None:
             os.remove(self.map_file)
