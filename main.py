@@ -130,6 +130,8 @@ class Map(QMainWindow):
     def cancel(self):
         self.labelForInfo.setText("")
         self.lineAddress.setText("")
+        self.point = None
+        self.change_map()
 
     def closeEvent(self, event):
         os.remove(self.map_file)
