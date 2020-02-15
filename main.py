@@ -122,7 +122,7 @@ class Map(QMainWindow):
         else:
             return
         self.lineGetX.setText(self.coordinates[0])
-        self.lineGetY.setText(self.coordinates[ 1])
+        self.lineGetY.setText(self.coordinates[1])
         self.sbScale.setValue(self.scale)
         self.step = 360 / (2 ** (self.scale))
         self.change_map()
