@@ -56,6 +56,8 @@ class Map(QMainWindow):
         self.sbScale.setMaximum(20)
         self.sbScale.setMinimum(0)
         self.sbScale.setValue(self.scale)
+        self.lineGetX.setText(self.coordinates[0])
+        self.lineGetY.setText(self.coordinates[1])
         self.radioLayout.itemAt(0).widget().toggle()
         self.radioLayout.itemAt(0).widget().toggled.connect(
             lambda: self.type_of_map("map" * int(self.radioLayout.itemAt(0).widget().isChecked())))
@@ -99,6 +101,8 @@ class Map(QMainWindow):
             self.coordinates[1] = str(float(self.coordinates[1]) - self.step)
         else:
             return
+        self.lineGetX.setText(self.coordinates[0])
+        self.lineGetY.setText(self.coordinates[1])
         self.sbScale.setValue(self.scale)
         self.step = 360 / (2 ** (self.scale))
         self.change_map()
