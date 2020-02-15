@@ -56,6 +56,7 @@ class Map(QMainWindow):
         self.sbScale.setMaximum(20)
         self.sbScale.setMinimum(0)
         self.sbScale.setValue(self.scale)
+        self.pbAnnul.clicked.connect(self.cancel)
         self.lineGetX.setText(self.coordinates[0])
         self.lineGetY.setText(self.coordinates[1])
         self.radioLayout.itemAt(0).widget().toggle()
@@ -102,10 +103,14 @@ class Map(QMainWindow):
         else:
             return
         self.lineGetX.setText(self.coordinates[0])
-        self.lineGetY.setText(self.coordinates[1])
+        self.lineGetY.setText(self.coordinates[ 1])
         self.sbScale.setValue(self.scale)
         self.step = 360 / (2 ** (self.scale))
         self.change_map()
+
+    def cancel(self):
+        self.labelForInfo.setText("")
+        self.lineAddress.setText("")
 
     def closeEvent(self, event):
         os.remove(self.map_file)
