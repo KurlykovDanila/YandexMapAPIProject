@@ -15,7 +15,7 @@ class Map(QMainWindow):
         super().__init__()
         self.coordinates = ['82.920430', '55.030199']
         self.scale = 10
-        self.step = 360 / (2 ** (self.scale))
+        self.step = 360 / (2 ** self.scale)
         self.map_type = "map"
         self.map_file = None
         self.point = None
@@ -32,10 +32,10 @@ class Map(QMainWindow):
             json_response = response.json()
             toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
             toponym_coodrinates = toponym["Point"]["pos"].split()
-            self.coordinates = toponym_coodrinates
-            self.point = toponym_coodrinates
-            print(toponym_coodrinates)
+            self.coordinates = toponym_coodrinates[:]
+            self.point = toponym_coodrinates[:]
             self.scale = self.sbScale.value()
+            self.change_map()
 
     def get_image(self):
         map_api_server = "http://static-maps.yandex.ru/1.x/"
@@ -65,8 +65,7 @@ class Map(QMainWindow):
 
     def change_map(self):
         self.get_image()
-        self.pixmap = QPixmap(self.map_file)
-        self.mapImg.setPixmap(self.pixmap)
+        self.mapImg.setPixmap(QPixmap(self.map_file))
 
     def init_ui(self):
         uic.loadUi('window.ui', self)
@@ -108,7 +107,7 @@ class Map(QMainWindow):
 
     def keyPressEvent(self, button):
         if button.key() == Qt.Key_PageUp:
-            self.scale = min(self.scale + 1, 20)
+            self.scale = min(self.scale + 1, 19)
         elif button.key() == Qt.Key_PageDown:
             self.scale = max(self.scale - 1, 0)
         elif button.key() == Qt.Key_Right:
