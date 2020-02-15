@@ -18,7 +18,24 @@ class Map(QMainWindow):
         self.step = 360 / (2 ** (self.scale))
         self.map_type = "map"
         self.map_file = None
+        self.point = None
         self.init_ui()
+
+    def get_address(self):
+        geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
+        geocoder_params = {
+            "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+            "geocode": self.lineAddress.text(),
+            "format": "json"}
+        response = requests.get(geocoder_api_server, params=geocoder_params)
+        if response:
+            json_response = response.json()
+            toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+            toponym_coodrinates = toponym["Point"]["pos"].split()
+            self.coordinates = toponym_coodrinates
+            self.point = toponym_coodrinates
+            print(toponym_coodrinates)
+            self.scale = self.sbScale.value()
 
     def get_image(self):
         map_api_server = "http://static-maps.yandex.ru/1.x/"
@@ -28,6 +45,8 @@ class Map(QMainWindow):
             "l": self.map_type,
             "size": "450,450"
         }
+        if self.point is not None:
+            map_params['pt'] = ",".join(self.point) + ',pm2rdm'
         response = requests.get(map_api_server, params=map_params)
 
         if not response:
@@ -53,6 +72,7 @@ class Map(QMainWindow):
         uic.loadUi('window.ui', self)
         self.change_map()
         self.pbShow.clicked.connect(self.get_coordinates)
+        self.pbFind.clicked.connect(self.get_address)
         self.sbScale.setMaximum(20)
         self.sbScale.setMinimum(0)
         self.sbScale.setValue(self.scale)
