@@ -19,6 +19,8 @@ class Map(QMainWindow):
         self.map_type = "map"
         self.map_file = None
         self.point = None
+        self.index = None
+        self.show_ind = False
         self.init_ui()
 
     def get_address(self):
@@ -31,10 +33,16 @@ class Map(QMainWindow):
         if response:
             json_response = response.json()
             toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+            address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
             toponym_coodrinates = toponym["Point"]["pos"].split()
+            try:
+                self.index = toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]['postal_code']
+            except:
+                pass
             self.coordinates = toponym_coodrinates[:]
             self.point = toponym_coodrinates[:]
             self.scale = self.sbScale.value()
+            self.labelForInfo.setText(address + ("\nIndex: " + str(self.index)) * int(self.show_ind))
             self.change_map()
 
     def get_image(self):
@@ -72,9 +80,10 @@ class Map(QMainWindow):
         self.change_map()
         self.pbShow.clicked.connect(self.get_coordinates)
         self.pbFind.clicked.connect(self.get_address)
-        self.sbScale.setMaximum(20)
+        self.sbScale.setMaximum(19)
         self.sbScale.setMinimum(0)
         self.sbScale.setValue(self.scale)
+        ##self.cbWPI.stateChanged.connect(lambda: self.show_index(self.cbWPI.isTristate()))
         self.pbAnnul.clicked.connect(self.cancel)
         self.lineGetX.setText(self.coordinates[0])
         self.lineGetY.setText(self.coordinates[1])
@@ -85,6 +94,12 @@ class Map(QMainWindow):
             lambda: self.type_of_map("sat" * int(self.radioLayout.itemAt(1).widget().isChecked())))
         self.radioLayout.itemAt(2).widget().toggled.connect(
             lambda: self.type_of_map("map,trf,skl" * int(self.radioLayout.itemAt(2).widget().isChecked())))
+
+    def show_index(self, state):
+        if state:
+            self.show_ind = True
+        else:
+            self.show_ind = False
 
     def type_of_map(self, text):
         if text != '':
