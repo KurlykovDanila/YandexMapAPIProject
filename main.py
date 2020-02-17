@@ -18,6 +18,7 @@ class Map(QMainWindow):
         self.step = 360 / (2 ** self.scale)
         self.map_type = "map"
         self.map_file = None
+        self.show_index = False
         self.point = None
         self.init_ui()
 
@@ -67,12 +68,18 @@ class Map(QMainWindow):
             file.write(response.content)
 
     def change_map(self):
+        self.update_widgets()
         self.get_image()
         self.mapImg.setPixmap(QPixmap(self.map_file))
+
+    def update_widgets(self):
+        self.lineGetX.setText(self.coordinates[0])
+        self.lineGetY.setText(self.coordinates[1])
 
     def init_ui(self):
         uic.loadUi('window.ui', self)
         self.change_map()
+        self.cbWPI.stateChanged.connect(self.change_map)
         self.pbShow.clicked.connect(self.get_coordinates)
         self.pbFind.clicked.connect(self.get_address)
         self.sbScale.setMaximum(20)
@@ -88,6 +95,9 @@ class Map(QMainWindow):
             lambda: self.type_of_map("sat" * int(self.radioLayout.itemAt(1).widget().isChecked())))
         self.radioLayout.itemAt(2).widget().toggled.connect(
             lambda: self.type_of_map("map,trf,skl" * int(self.radioLayout.itemAt(2).widget().isChecked())))
+
+    def change_show_index(self):
+        self.show_index = not(self.show_index)
 
     def type_of_map(self, text):
         if text != '':
@@ -115,17 +125,16 @@ class Map(QMainWindow):
         elif button.key() == Qt.Key_PageDown:
             self.scale = max(self.scale - 1, 0)
         elif button.key() == Qt.Key_Right:
-            self.coordinates[0] = str(float(self.coordinates[0]) + self.step)
+            self.coordinates[0] = str(float(self.coordinates[0]) + self.step * 2)
         elif button.key() == Qt.Key_Left:
-            self.coordinates[0] = str(float(self.coordinates[0]) - self.step)
+            self.coordinates[0] = str(float(self.coordinates[0]) - self.step * 2)
         elif button.key() == Qt.Key_Up:
             self.coordinates[1] = str(float(self.coordinates[1]) + self.step)
         elif button.key() == Qt.Key_Down:
             self.coordinates[1] = str(float(self.coordinates[1]) - self.step)
         else:
             return
-        self.lineGetX.setText(self.coordinates[0])
-        self.lineGetY.setText(self.coordinates[1])
+
         self.sbScale.setValue(self.scale)
         self.step = 360 / (2 ** (self.scale))
         self.change_map()

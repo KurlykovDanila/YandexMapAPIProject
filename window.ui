@@ -256,7 +256,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="cbWPI">
     <property name="geometry">
      <rect>
       <x>380</x>
