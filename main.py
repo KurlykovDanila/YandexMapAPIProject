@@ -19,6 +19,7 @@ class Map(QMainWindow):
         self.map_type = "map"
         self.map_file = None
         self.show_index = False
+        self.index = None
         self.point = None
         self.init_ui()
 
@@ -31,16 +32,21 @@ class Map(QMainWindow):
         response = requests.get(geocoder_api_server, params=geocoder_params)
         if response:
             json_response = response.json()
-            self.labelForInfo.setText("""""")
+            self.tbWA.setText("""""")
             if int(json_response["response"]["GeoObjectCollection"]['metaDataProperty']['GeocoderResponseMetaData']
                    ['found']) == 0:
-                self.labelForInfo.setText("""REQUEST ERROR""")
                 return
             toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+            address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
             toponym_coodrinates = toponym["Point"]["pos"].split()
+            try:
+                self.index = toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]['postal_code']
+            except:
+                self.index = "Index not found. Please, enter more precise address"
             self.coordinates = toponym_coodrinates[:]
             self.point = toponym_coodrinates[:]
             self.scale = self.sbScale.value()
+            self.tbWA.append(address + ("\nIndex: " + str(self.index)) * int(self.show_index))
             self.change_map()
 
     def get_image(self):
@@ -56,7 +62,6 @@ class Map(QMainWindow):
         response = requests.get(map_api_server, params=map_params)
 
         if not response:
-            self.labelForInfo.setText("""IMAGE ERROR""")
             return
         if self.map_file is not None:
             os.remove(self.map_file)
@@ -79,7 +84,7 @@ class Map(QMainWindow):
     def init_ui(self):
         uic.loadUi('window.ui', self)
         self.change_map()
-        self.cbWPI.stateChanged.connect(self.change_map)
+        self.cbWPI.stateChanged.connect(self.change_show_index)
         self.pbShow.clicked.connect(self.get_coordinates)
         self.pbFind.clicked.connect(self.get_address)
         self.sbScale.setMaximum(20)
@@ -98,6 +103,7 @@ class Map(QMainWindow):
 
     def change_show_index(self):
         self.show_index = not(self.show_index)
+        self.get_address()
 
     def type_of_map(self, text):
         if text != '':
@@ -125,13 +131,13 @@ class Map(QMainWindow):
         elif button.key() == Qt.Key_PageDown:
             self.scale = max(self.scale - 1, 0)
         elif button.key() == Qt.Key_Right:
-            self.coordinates[0] = str(float(self.coordinates[0]) + self.step * 2)
+            self.coordinates[0] = str(max(min(float(self.coordinates[0]) + self.step * 2, 180), -180))
         elif button.key() == Qt.Key_Left:
-            self.coordinates[0] = str(float(self.coordinates[0]) - self.step * 2)
+            self.coordinates[0] = str(max(min(float(self.coordinates[0]) - self.step * 2, 180), -180))
         elif button.key() == Qt.Key_Up:
-            self.coordinates[1] = str(float(self.coordinates[1]) + self.step)
+            self.coordinates[1] = str(max(min(float(self.coordinates[1]) + self.step, 90), -90))
         elif button.key() == Qt.Key_Down:
-            self.coordinates[1] = str(float(self.coordinates[1]) - self.step)
+            self.coordinates[1] = str(max(min(float(self.coordinates[1]) - self.step, 90), -90))
         else:
             return
 
@@ -140,7 +146,7 @@ class Map(QMainWindow):
         self.change_map()
 
     def cancel(self):
-        self.labelForInfo.setText("")
+        self.tbWA.clear()
         self.lineAddress.setText("")
         self.point = None
         self.change_map()

@@ -182,9 +182,9 @@
    <widget class="QLineEdit" name="lineAddress">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>90</x>
       <y>640</y>
-      <width>291</width>
+      <width>271</width>
       <height>20</height>
      </rect>
     </property>
@@ -197,7 +197,7 @@
      <rect>
       <x>6</x>
       <y>640</y>
-      <width>71</width>
+      <width>91</width>
       <height>20</height>
      </rect>
     </property>
@@ -238,22 +238,6 @@
     </property>
     <property name="text">
      <string>annul</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelForInfo">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>670</y>
-      <width>361</width>
-      <height>111</height>
-     </rect>
-    </property>
-    <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
-    </property>
-    <property name="text">
-     <string/>
     </property>
    </widget>
    <widget class="QCheckBox" name="cbWPI">
@@ -299,6 +283,16 @@
     </property>
     <property name="text">
      <string>scale:</string>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="tbWA">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>680</y>
+      <width>451</width>
+      <height>131</height>
+     </rect>
     </property>
    </widget>
   </widget>
